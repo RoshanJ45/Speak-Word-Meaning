@@ -1,0 +1,50 @@
+# Importing modules
+from tkinter import *
+import pyttsx3
+import requests
+
+dicti = Tk()
+dicti.title("Roshan Dictionary")
+dicti.geometry('550x500')
+
+
+def speaking(audio):
+    # initial constructor of pyttsx3 and having the sapi5 in it as a parameter
+    engine = pyttsx3.init('sapi5')
+    # Making it speak
+    engine.say(audio)
+    engine.runAndWait()
+
+
+def word_meaning():
+    input_word = e1.get()
+    req = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}")
+    # If the response was successful, get the meaning of the word
+    if req.ok:
+        # Convert the response to JSON
+        data = req.json()
+        # Get the first definition of the word
+        definition = data[0]["meanings"][0]["definitions"][0]["definition"]
+        spokenText.set(definition)
+        speaking("the meaning  is" + str(definition))
+    # Otherwise, display an error message
+    else:
+        spokenText.set("Word not found")
+
+
+spokenText = StringVar(dicti)
+Label(dicti, text='Speak the Meaning', font="45", fg='blue').pack(pady=10)
+# Getting the input of word from the user
+Label(dicti, text='Enter the word:', font="15").pack(pady=10)
+
+e1 = Entry(dicti, width=25)
+e1.pack(pady=7)
+# Label to show the correct word
+Label(dicti, text="Meaning:", font="15").pack(pady=10)
+Label(dicti, textvariable=spokenText, width=80, height=15, font=('Arial 10')).pack(pady=10)
+spokenText.set("Type the word for which you want to find the meaning")
+speaking("Type the word for which you want to find the meaning")
+
+Button(dicti, text="Speak Meaning", font="bold", command=word_meaning).pack(pady=10)
+# to keep running the window
+dicti.mainloop()
